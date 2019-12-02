@@ -5,7 +5,7 @@ var permission = require('../models/permission')
 router.post('/check_role', function(req, res){
 
     var options = {
-        modelId : req.body.modelId,
+        ownderId : req.body.ownerId,
         modelName : req.body.modelName,
         token : req.headers.accessToken,
         accessType: req.body.accessType,
