@@ -131,6 +131,56 @@ var getUserId = function(token, userRoles, cb){
 exports.getUserId = getUserId;
 
 var checkPermission = function(option, cb){
+    if(option.modelName){
+        getRoleFromModel(option, function(err, result){
+            if(err){
+                cb(err)
+            }else{
+                cb(null, result)
+            }
+        })        
+    }else{
+        getRoleFromFunction(option, function(err, result){
+            if(err){
+                cb(err)
+            }else{
+                cb(null, result)
+            }
+        })
+    }
+}
+exports.checkPermission = checkPermission
+
+var getRoleFromFunction = function(option, cb){
+    acls.getFunctionAcl(option.functionName, option.serviceName, function(err, aclRoles){
+        if(err){
+            cb(err)
+        }else{
+            getRole(option, aclRoles, function(err, userRoles){
+                if(err){
+                    cb(err)
+                }else{
+                    let response = {
+                        "allow": false,
+                        "userRole": null          
+                    }
+                    for(let role in userRoles){
+                        if(aclRoles && aclRoles.indexOf(userRoles[role]) != -1){
+                            response.allow = true;
+                            response.userRole = userRoles[role];
+                            break;
+                        }
+                    }
+                    cb(null, response)
+                }
+            })
+        }
+    })
+    
+}
+exports.getRoleFromFunction = getRoleFromFunction
+
+var getRoleFromModel = function(option, cb){
     acls.getAcls(option.modelName, option.accessType, option.serviceName, function(err, aclRoles){
         if(err){
             cb(err)
@@ -156,4 +206,4 @@ var checkPermission = function(option, cb){
         }
     })
 }
-exports.checkPermission = checkPermission
+exports.getRoleFromModel = getRoleFromModel;

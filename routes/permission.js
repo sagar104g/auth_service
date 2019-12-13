@@ -7,6 +7,7 @@ router.post('/check_role', function(req, res){
     var options = {
         ownderId : req.body.ownerId,
         modelName : req.body.modelName,
+        customFunction : req.body.customFunction,
         token : req.headers.accessToken,
         accessType: req.body.accessType,
         serviceName: req.body.serviceName
@@ -21,5 +22,4 @@ router.post('/check_role', function(req, res){
         }
     })
 })
-
 module.exports = router;
