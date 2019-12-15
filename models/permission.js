@@ -73,7 +73,11 @@ var getRolesFromUserModel = function(userId, cb){
             if(result && result.influencer && result.influencer == 'yes'){
                 cb(null, '$influencer')
             }else{
-                cb({'error':'no user Found'})
+                if(result && result.influencer && (result.influencer == 'no' || result.influencer == 'requested')){
+                    cb(null, '$user')
+                }else{
+                    cb({'error':'no user Found'})
+                }
             }
         }
     })
