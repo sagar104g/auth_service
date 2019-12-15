@@ -2,19 +2,19 @@ var acls = require('./acls');
 var mongo = require('../utility/mongoQueries');
 var config = require('../config/config')
 
-var getRole = function(token, cb){
+var getRole = function(token, aclRoles, cb){
     var userRoles =  []
     userRoles.push("$public")
-    if(userRoles.indexOf("$public") != -1){
+    if(aclRoles.indexOf("$public") != -1){
         return cb(null, userRoles)
     }
-    getUserId(token, userRoles, function(err, userId){
+    getUserId(token, function(err, userId){
         if(err){
             return cb(err)
         }else{
             if(userId != -1){
                 userRoles.push("$authenticated")
-                if(userRoles.indexOf("$authenticated") != -1){
+                if(aclRoles.indexOf("$authenticated") != -1){
                     return cb(null, userRoles)
                 }
                 getStaticRole(userId, function(err, result){
@@ -23,9 +23,9 @@ var getRole = function(token, cb){
                     }else{
                         if(result){
                             for(var role in result){
-                                if(result[role] && result[role].joinOutput && result[role].joinOutput.roleName){
-                                    userRoles.push(result[role].joinOutput.roleName)
-                                    if(userRoles.indexOf(result[role].joinOutput.roleName) != -1){
+                                if(result[role] && result[role].roleName){
+                                    userRoles.push(result[role].roleName)
+                                    if(userRoles.indexOf(result[role].roleName) != -1){
                                         return cb(null, userRoles)
                                     }
                                 }
@@ -37,8 +37,9 @@ var getRole = function(token, cb){
                             }else{
                                 if(result){
                                     userRoles.push("$self")
-                                }else{
-                                    return cb(null, userRoles)
+                                    if(aclRoles.indexOf("$self") != -1){
+                                        return cb(null, userRoles)
+                                    }
                                 }
                                 getRolesFromUserModel(userId, function(err, result){
                                     if(err){
@@ -47,7 +48,7 @@ var getRole = function(token, cb){
                                         if(result){
                                             userRoles.push(result)
                                         }
-                                            return cb(null, userRoles)
+                                        return cb(null, userRoles)
                                     }
                                 })
                             }
@@ -69,8 +70,8 @@ var getRolesFromUserModel = function(userId, cb){
         if(err){
             cb(err)
         }else{
-            if(result && result.designation){
-                cb(null, result.designation)
+            if(result && result.influencer && result.influencer == 'yes'){
+                cb(null, '$influencer')
             }else{
                 cb({'error':'no user Found'})
             }
@@ -95,7 +96,10 @@ var getStaticRole = function(userId, cb){
                  foreignField: '_id',
                  as: "joinOutput"
              } 
-             },{$match:{
+             },{$unwind : { 
+                path: "$joinOutput" 
+              } 
+            },{$match:{
                  $and :[{
                          'user_id': userId
                        }]
@@ -115,14 +119,14 @@ var getStaticRole = function(userId, cb){
 }
 exports.getStaticRole = getStaticRole;
 
-var getUserId = function(token, userRoles, cb){
+var getUserId = function(token, cb){
     let queryObj = {"token" : token}
     mongo.findOne(config.authDb, 'access_token',queryObj, function(err, result){
         if(err){
             cb(err)
         }else{
-            if(result){
-                cb(null, userRoles)
+            if(result && result.user_id){
+                cb(null, result.user_id)
             }else{
                 cb({'error':'no user Found'})
             }

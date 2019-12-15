@@ -4,8 +4,8 @@ var config = require('../config/config')
 
 var login = function(body, cb){
 
-    if(body.userName && body.password){    
-        let findQuery = {'username':body.userName}
+    if(body.username && body.password){    
+        let findQuery = {'username':body.username}
         mongoQuery.findOne(config.mainDb, 'user', findQuery, function(err, result){
             if(err){
                 cb(err)
@@ -13,35 +13,35 @@ var login = function(body, cb){
                 if(result){
                     util.compareHash(body.password, result.password, function(result){
                         if(result){
-                            var payLoad = {'username': body.userName}
+                            var payLoad = {'username': body.username}
                             util.tokenCreator(payLoad, function(err, token){
                                 if(err){
                                     cb(err)
                                 }else{
                                     var insertObj = {
-                                        "user": body.userName,
+                                        "user": body.username,
                                         "token": token
                                     }
                                     mongoQuery.insertOne(config.authDb, 'access_token', insertObj, function(err , result){
                                         if(err){
                                             cb(err)
                                         }else{
-                                            cb(null, result)
+                                            cb(null, token)
                                         }
                                     })
                                 }
                             })
                         }else{
-                            cb({'error': 'userName or password is not matching'})
+                            cb({'error': 'username or password is not matching'})
                         }
                     })
                 }else{
-                    cb({'error': 'userName or password is not matching'})
+                    cb({'error': 'username or password is not matching'})
                 }
             }
         })
     }else{
-        cb({'error': 'userName or password missing'})
+        cb({'error': 'username or password missing'})
     }
 }
 exports.login = login;

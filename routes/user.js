@@ -21,7 +21,7 @@ router.post('/logout', function(req, res){
             res.json({"error":"some error happend"})
         }else{
             res.status(200)
-            res.json(result)
+            res.json({"message": "you have been logged out"})
         }
     })
 })
