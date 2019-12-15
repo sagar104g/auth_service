@@ -15,7 +15,7 @@ app.use(bodyParser.json())
 
 app.use('/permission', permission)
 app.use('/user', user)
-agg.get('/status', function(req, res){
+app.get('/status', function(req, res){
   res.json({"status": "ok"})
 })
 
