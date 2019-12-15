@@ -1,4 +1,5 @@
 var mongoQuery = require('../utility/mongoQueries')
+var config = require('../config/config')
 var accessControlList = {}
 
 var aclSetup = function(){
@@ -6,14 +7,14 @@ var aclSetup = function(){
         var aggregateQuery = [{$lookup:{
             from: 'fu_acls',
             localField: '_id',
-            foreignField: 'modelId',
+            foreignField: 'model_id',
             as: "joinOutput"
-        } 
+        }
         },{$unwind : { 
             path: "$joinOutput" 
           } 
         }];
-        mongoQuery.aggregate('fu-test-db', 'fu_model_config', aggregateQuery, function(err, result){
+        mongoQuery.aggregate(config.authDb, 'fu_model_config', aggregateQuery, function(err, result){
             if(err){
                 reject()
                 cb(err)

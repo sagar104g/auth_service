@@ -1,18 +1,19 @@
 var mongoQuery = require('../utility/mongoQueries')
 var util = require('../utility/util')
+var config = require('../config/config')
 
 var login = function(body, cb){
 
     if(body.userName && body.password){    
-        let findQuery = {'userName':body.userName}
-        mongoQuery.findOne('fu-test-db', 'user', findQuery, function(err, result){
+        let findQuery = {'username':body.userName}
+        mongoQuery.findOne(config.mainDb, 'user', findQuery, function(err, result){
             if(err){
                 cb(err)
             }else{
                 if(result){
                     util.compareHash(body.password, result.password, function(result){
                         if(result){
-                            var payLoad = {'userName': body.userName}
+                            var payLoad = {'username': body.userName}
                             util.tokenCreator(payLoad, function(err, token){
                                 if(err){
                                     cb(err)
@@ -21,7 +22,7 @@ var login = function(body, cb){
                                         "user": body.userName,
                                         "token": token
                                     }
-                                    mongoQuery.insertOne('fu-test-db', 'accessToken', insertObj, function(err , result){
+                                    mongoQuery.insertOne(config.authDb, 'access_token', insertObj, function(err , result){
                                         if(err){
                                             cb(err)
                                         }else{
@@ -48,7 +49,7 @@ exports.login = login;
 var logout = function(token, cb){
     if(token){
         var deleteObj = {'token': token}
-        mongoQuery.deleteOne('fu-test-db', 'accessToken', deleteObj, function(err, result){
+        mongoQuery.deleteOne(config.authDb, 'access_token', deleteObj, function(err, result){
             if(err){
                 cb(err)
             }else{
@@ -60,29 +61,3 @@ var logout = function(token, cb){
     }
 }
 exports.logout = logout;
-
-var signup = function(body, cb){
-
-    if(body.userName && body.password){
-        util.makeHash(body.password, function(err, result){
-            if(err){
-                cb(err)
-            }else{
-                var insertObj = {
-                    'userName': body.userName,
-                    'password': result
-                }
-                mongoQuery.insertOne('fu-test-db', 'user', insertObj, function(err, result){
-                    if(err){
-                        cb(err)
-                    }else{
-                        cb(null, result)
-                    }
-                })
-            }
-        })
-    }else{
-        cb({"err":"userName or password missing"})
-    }
-}
-exports.signup = signup;

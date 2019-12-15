@@ -1,5 +1,6 @@
 var acls = require('./acls');
 var mongo = require('../utility/mongoQueries');
+var config = require('../config/config')
 
 var getRole = function(token, cb){
     var userRoles =  []
@@ -63,8 +64,8 @@ var getRole = function(token, cb){
 exports.getRole = getRole
 
 var getRolesFromUserModel = function(userId, cb){
-    let queryObj = {"userId" : userId, "active": 1}
-    mongo.findOne('fu-test-db', 'user',queryObj, function(err, result){
+    let queryObj = {"user_id" : userId, "active": 1}
+    mongo.findOne(config.mainDb, 'user',queryObj, function(err, result){
         if(err){
             cb(err)
         }else{
@@ -90,17 +91,17 @@ exports.checkOwnerRole = checkOwnerRole;
 var getStaticRole = function(userId, cb){
     var aggregateQuery = [{$lookup:{
                  from: 'role',
-                 localField: 'roleId',
+                 localField: 'role_id',
                  foreignField: '_id',
                  as: "joinOutput"
              } 
              },{$match:{
                  $and :[{
-                         'userId': userId
+                         'user_id': userId
                        }]
                }
      }];
-     mongo.aggregate('fu-test-db', 'role_mapping', aggregateQuery, function(err, result){
+     mongo.aggregate(config.authDb, 'role_mapping', aggregateQuery, function(err, result){
          if(err){
              cb(err)
          }else{
@@ -116,7 +117,7 @@ exports.getStaticRole = getStaticRole;
 
 var getUserId = function(token, userRoles, cb){
     let queryObj = {"token" : token}
-    mongo.findOne('fu-test-db', 'accessToken',queryObj, function(err, result){
+    mongo.findOne(config.authDb, 'access_token',queryObj, function(err, result){
         if(err){
             cb(err)
         }else{

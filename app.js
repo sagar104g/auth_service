@@ -1,28 +1,28 @@
-// const Sentry = require('@sentry/node');
-// Sentry.init({ dsn: 'https://c708079d53934185998ed7c755bc6212@sentry.io/1813565' });
+const Sentry = require('@sentry/node');
 const express = require('express')
 const app = express()
-var mongoPromise = require('./services/mongo')
+var mongoConnection = require('./services/mongo')
 var aclsPromise = require('./models/acls')
 var user = require('./routes/user')
 var permission = require('./routes/permission')
 var bodyParser = require('body-parser')
+var config = require('./config/config')
 
-// parse application/x-www-form-urlencoded
+Sentry.init({ dsn: config.SENTRY_DSN });
+app.use(Sentry.Handlers.requestHandler());
 app.use(bodyParser.urlencoded({ extended: false }))
- 
-// parse application/json
 app.use(bodyParser.json())
-
-// bootFilePromises = bootFile.map(function(name){
-//   var promise = require(name).ready
-//   return promise;
-// })
 
 app.use('/permission', permission)
 app.use('/user', user)
 
-mongoPromise.mongoPoolConnection().then( function(){
+app.use(Sentry.Handlers.errorHandler());
+app.use(function onError(err, req, res, next) {
+  res.end(res.sentry + "\n");
+  logger.info("Error Handled Via Sentry: "+res.sentry)
+  next();
+});
+Promise.all(mongoConnection.mongoPromise).then( function(){
   aclsPromise.aclSetup()
 }).then( function(){
   app.listen(4000, function () {
