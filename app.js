@@ -15,6 +15,9 @@ app.use(bodyParser.json())
 
 app.use('/permission', permission)
 app.use('/user', user)
+agg.get('/status', function(req, res){
+  res.json({"status": "ok"})
+})
 
 app.use(Sentry.Handlers.errorHandler());
 app.use(function onError(err, req, res, next) {
