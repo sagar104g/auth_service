@@ -15,7 +15,7 @@ router.post('/login', function(req, res){
 })
 
 router.post('/logout', function(req, res){
-    user.logout(req.body, function(err, result){
+    user.logout(req.headers.authorization, function(err, result){
         if(err){
             res.status(500)
             res.json({"error":"some error happend"})

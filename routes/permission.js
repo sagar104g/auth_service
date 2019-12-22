@@ -8,7 +8,7 @@ router.post('/check_role', function(req, res){
         ownderId : req.body.ownerId,
         modelName : req.body.modelName,
         customFunction : req.body.customFunction,
-        token : req.headers.accessToken,
+        token : req.headers.authorization,
         accessType: req.body.accessType,
         serviceName: req.body.serviceName
     }

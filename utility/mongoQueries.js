@@ -55,7 +55,7 @@ var deleteOne = function(dbName, collectionName, deleteQuery, cb){
     
     var db = mongoService.getMongoConnection(dbName)
     // var deleteObj = { token: 'Mountain 21' };
-    dbo.collection(collectionName).deleteOne(deleteQuery, function(err, result) {
+    db.collection(collectionName).deleteOne(deleteQuery, function(err, result) {
         if(err){
             cb(err)
         }else{

@@ -13,7 +13,7 @@ for(dbName in config){
 			mongo.connect(url, {useUnifiedTopology: true}, {
 				poolSize: 10
 			}, function(err, db){
-				if(err){
+				 if(err){
 					reject(err);
 				} else{
 					mongoConnectionsPool[name] = db;

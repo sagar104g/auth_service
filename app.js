@@ -22,7 +22,7 @@ app.get('/status', function(req, res){
 app.use(Sentry.Handlers.errorHandler());
 app.use(function onError(err, req, res, next) {
   res.end(res.sentry + "\n");
-  logger.info("Error Handled Via Sentry: "+res.sentry)
+  console.log("Error Handled Via Sentry: "+res.sentry)
   next();
 });
 Promise.all(mongoConnection.mongoPromise).then( function(){
