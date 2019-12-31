@@ -7,6 +7,7 @@ var user = require('./routes/user')
 var permission = require('./routes/permission')
 var bodyParser = require('body-parser')
 var config = require('./config/config')
+var utils = require('./utility/util')
 
 Sentry.init({ dsn: config.SENTRY_DSN });
 app.use(Sentry.Handlers.requestHandler());
@@ -27,6 +28,8 @@ app.use(function onError(err, req, res, next) {
 });
 Promise.all(mongoConnection.mongoPromise).then( function(){
   aclsPromise.aclSetup()
+}).then( function(){
+  Promise.all(utils.secretPromise)
 }).then( function(){
   app.listen(4000, function () {
     console.info("Server is running on 4000 port");

@@ -1,5 +1,4 @@
 var mongoService = require('../services/mongo')
-var mongo = require('mongodb')
 
 var findOne = function(dbName, collectionName, query, cb){
 

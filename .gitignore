@@ -1,6 +1,11 @@
 #config
 config/config.js
+jwt_private.pem
+jwt_public.pub
+bcrypt_private.pem
+bcrypt_public.pub
 ecosystem.config.js
+launch.json
 # Logs
 logs
 *.log

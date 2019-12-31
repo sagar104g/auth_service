@@ -1,13 +1,16 @@
 var bcrypt = require('bcrypt')
 var jwt = require('jsonwebtoken');
-var saltRounds = 5;
-var salt = bcrypt.genSaltSync(saltRounds);
+var config = require('../config/config');
+var salt = bcrypt.genSaltSync(config.saltRounds);
 // var hash = bcrypt.hashSync(myPlaintextPassword, salt);
 var signOptions = {
-    expiresIn:  "15d",
-    algorithm:  "HS256"   // RSASSA [ "RS256", "RS384", "RS512" ]
+    expiresIn:  config.jwt_expire_time,
+    algorithm:  "RS512"   // RSASSA [ "HS256", "RS256", "RS384", "RS512" ]
    };
-var secret = 'secret';
+var path = require('path')
+var fs = require('fs')
+var keys = [] //keys[0] == jwtPrivate key, keys[1] == jwtPublic key
+var secretPromise = [];
 
 var makeHash = function(password, cb){
 bcrypt.hash(password, salt, function(err, hash) {
@@ -33,7 +36,7 @@ exports.compareHash = compareHash
 
 var tokenCreator = function(payLoad, cb){
 
-    jwt.sign(payLoad, secret, signOptions, function(err, token) {
+    jwt.sign(payLoad, keys[0], signOptions, function(err, token) {
         if(err){
             cb(err)
         }else{
@@ -45,7 +48,7 @@ exports.tokenCreator = tokenCreator;
 
 var tokenVerify = function(token, cb){
 
-    jwt.verify(token, secret, function(err, decoded) {
+    jwt.verify(token, keys[1], function(err, decoded) {
         if(err){
             cb(err)
         }else{
@@ -54,3 +57,32 @@ var tokenVerify = function(token, cb){
     });
 }
 exports.tokenVerify = tokenVerify;
+
+var readFile = function(fileName, cb){
+    // var fileName = '../config/'+indexName+'_setting.json';
+    fs.readFile(path.join(__dirname, fileName), 'utf8',function(err, file){
+        if(err){
+            cb(err)
+        }else{
+            cb(null, file)
+        }
+    })
+}
+exports.readFile = readFile;
+
+for(file in config.security_files){
+	secretPromise.push(new Promise(function(resolve, reject){
+        var fileName = '../config/'+config.security_files[file];
+        readFile(fileName, function(err, fileData){
+            if(err){
+                reject(err)
+            }else{
+                console.log("read file "+config.security_files[file]);
+                keys.push(fileData)
+                resolve()
+            }
+        })
+    })
+	)
+}
+exports.secretPromise = secretPromise
