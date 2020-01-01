@@ -10,15 +10,16 @@ var login = function(body, cb){
             if(err){
                 cb(err)
             }else{
-                if(result){
+                if(result && result.user_id){
                     util.compareHash(body.password, result.password, function(result){
                         if(result){
-                            var payLoad = {'username': body.username}
+                            var payLoad = {'username': body.username, "user_id": result.user_id}
                             util.tokenCreator(payLoad, function(err, token){
                                 if(err){
                                     cb(err)
                                 }else{
                                     var insertObj = {
+                                        "user_id": result.user_id,
                                         "user": body.username,
                                         "token": token
                                     }
@@ -61,3 +62,18 @@ var logout = function(token, cb){
     }
 }
 exports.logout = logout;
+
+var getUserIdFromToken = function(token, cb){
+    if(token){
+        util.tokenVerify(token, function(err, result){
+            if(err){
+                cb(err)
+            }else{
+                cb(null, {"user_id": result.user_id})
+            }
+        })
+    }else{
+        cb({"err":"accessToken missing"})
+    }
+}
+exports.getUserIdFromToken = getUserIdFromToken;
