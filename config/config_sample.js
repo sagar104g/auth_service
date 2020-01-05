@@ -1,5 +1,6 @@
 var config = {
 	"mongo_fu-test-db": {
+		starter: 'mongodb',
 		username: 'test',
 		password: 'test',
 		hosts: 'localhost',
@@ -7,6 +8,7 @@ var config = {
 		database: 'dbName'
 	},
 	"mongo_main": {
+		starter: 'mongodb',
 		username: 'test',
 		password: 'test',
 		hosts: 'localhost',

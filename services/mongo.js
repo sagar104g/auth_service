@@ -8,7 +8,7 @@ for(dbName in config){
 	if(dbName.indexOf('mongo_')==0){
 		mongoPromise.push(new Promise(function(resolve, reject){
 			//mongodb://test:try@localhost/fu-test-db?replicaSet=fu_test   password
-			var url = 'mongodb://'+config[dbName].username+':'+config[dbName].password+'@'+config[dbName].hosts+'/'+config[dbName].database+'?replicaSet='+config[dbName].replicaSet;
+			var url = config[dbName].starter+'://'+config[dbName].username+':'+config[dbName].password+'@'+config[dbName].hosts+'/'+config[dbName].database+'?replicaSet='+config[dbName].replicaSet;
 			var name = dbName.split('mongo_')[1];
 			mongo.connect(url, {useUnifiedTopology: true}, {
 				poolSize: 10
