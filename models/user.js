@@ -6,17 +6,19 @@ var login = function(body, cb){
 
     if(body.username && body.password){    
         let findQuery = {'username':body.username}
-        mongoQuery.findOne(config.mainDb, 'user', findQuery, function(err, result){
+        mongoQuery.findOne(config.mainDb, 'users', findQuery, function(err, result){
             if(err){
-                cb(err)
+                console.log(err)
+                cb({"err":"some internal error occurred"})
             }else{
                 if(result && result.user_id){
-                    util.compareHash(body.password, result.password, function(result){
-                        if(result){
+                    util.compareHash(body.password, result.password_digest, function(hashResult){
+                        if(hashResult){
                             var payLoad = {'username': body.username, "user_id": result.user_id}
                             util.tokenCreator(payLoad, function(err, token){
                                 if(err){
-                                    cb(err)
+                                    console.log(err)
+                                    cb({"err":"some internal error occurred"})
                                 }else{
                                     var insertObj = {
                                         "user_id": result.user_id,
@@ -25,9 +27,10 @@ var login = function(body, cb){
                                     }
                                     mongoQuery.insertOne(config.authDb, 'access_token', insertObj, function(err , result){
                                         if(err){
-                                            cb(err)
+                                            console.log(err)
+                                            cb({"err":"some internal error occurred"})
                                         }else{
-                                            cb(null, token)
+                                            cb(null, {"token": token})
                                         }
                                     })
                                 }
@@ -52,7 +55,8 @@ var logout = function(token, cb){
         var deleteObj = {'token': token}
         mongoQuery.deleteOne(config.authDb, 'access_token', deleteObj, function(err, result){
             if(err){
-                cb(err)
+                console.log(err)
+                cb({"err":"some internal error occurred"})
             }else{
                 cb(null, result)
             }
@@ -67,7 +71,8 @@ var getUserIdFromToken = function(token, cb){
     if(token){
         util.tokenVerify(token, function(err, result){
             if(err){
-                cb(err)
+                console.log(err)
+                cb({"err":"some internal error occurred"})
             }else{
                 cb(null, {"user_id": result.user_id})
             }

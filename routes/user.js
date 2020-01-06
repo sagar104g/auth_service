@@ -6,7 +6,7 @@ router.post('/login', function(req, res){
     user.login(req.body, function(err, result){
         if(err){
             res.status(500)
-            res.json({"error":"some error happend"})
+            res.json(err)
         }else{
             res.status(200)
             res.json(result)
