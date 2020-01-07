@@ -12,7 +12,7 @@ var logger = new (winston.Logger)({
       },
       formatter: function (options) {
         return options.timestamp() + ' : ' + '[' + moduleName + ']' + ' : ' +
-        options.level + ' : ' + (options.message ? options.message.replace( /[\r\n]+/gm, "" ) : '');
+          options.level + ' : ' + (options.message ? options.message.replace(/[\r\n]+/gm, "") : '');
       },
       colorize: true
     })
@@ -22,7 +22,7 @@ var logger = new (winston.Logger)({
 var log = console.log;
 
 console.log = function () {
-    logger.info(getFileInfo() + ' : ' + util.format.apply(this,arguments));
+  logger.info(getFileInfo() + ' : ' + util.format.apply(this, arguments));
 };
 
 function CustomError() {
@@ -31,7 +31,7 @@ function CustomError() {
   const oldLimit = Error.stackTraceLimit;
   try {
     Error.stackTraceLimit = 3; // <- we only need the top 3
-    Error.prepareStackTrace = function(err, structuredStackTrace){ 
+    Error.prepareStackTrace = function (err, structuredStackTrace) {
       return structuredStackTrace;
     };
     Error.captureStackTrace(this, CustomError);
@@ -46,10 +46,10 @@ function getFileInfo() {
   const stack = new CustomError().stack;
   const CALLER_INDEX = 2; // <- position in stacktrace to find deepest caller
   const element = stack[CALLER_INDEX];
-  return element.getFileName()+':'+element.getLineNumber()+':'+element.getColumnNumber();
+  return element.getFileName() + ':' + element.getLineNumber() + ':' + element.getColumnNumber();
 }
 
-process.on('unhandledRejection', function(reason, p){
+process.on('unhandledRejection', function (reason, p) {
   console.log(reason);
 });
 
@@ -63,7 +63,7 @@ module.exports = function (fileName) {
     info: function (text) {
       if (typeof text === 'object')
         text = JSON.stringify(text);
-      logger.info(getFileInfo() +' : '+ text)
+      logger.info(getFileInfo() + ' : ' + text)
     }
   }
 

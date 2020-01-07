@@ -16,24 +16,24 @@ app.use(bodyParser.json())
 
 app.use('/permission', permission)
 app.use('/user', user)
-app.get('/status', function(req, res){
-  res.json({"status": "ok"})
+app.get('/status', function (req, res) {
+  res.json({ "status": "ok" })
 })
 
 app.use(Sentry.Handlers.errorHandler());
 app.use(function onError(err, req, res, next) {
   res.end(res.sentry + "\n");
-  console.log("Error Handled Via Sentry: "+res.sentry)
+  console.log("Error Handled Via Sentry: " + res.sentry)
   next();
 });
-Promise.all(mongoConnection.mongoPromise).then( function(){
+Promise.all(mongoConnection.mongoPromise).then(function () {
   aclsPromise.aclSetup()
-}).then( function(){
+}).then(function () {
   Promise.all(utils.secretPromise)
-}).then( function(){
+}).then(function () {
   app.listen(4000, function () {
     console.info("Server is running on 4000 port");
   });
-}).catch(function(err){
+}).catch(function (err) {
   console.log(err)
 })
