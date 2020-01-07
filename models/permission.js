@@ -192,7 +192,6 @@ var getRoleFromFunction = function (option, cb) {
             })
         }
     })
-
 }
 exports.getRoleFromFunction = getRoleFromFunction
 
@@ -206,13 +205,14 @@ var getRoleFromModel = function (option, cb) {
                 roles.push(aclRoles[value].role)
             }
             getRole(option, roles, function (err, userRoles) {
+                let response = {
+                    "allow": false,
+                    "userRole": null
+                }
                 if (err) {
-                    cb(err)
+                    console.log(err)
+                    cb(null, response)
                 } else {
-                    let response = {
-                        "allow": false,
-                        "userRole": null
-                    }
                     for (let role in userRoles) {
                         if (roles && roles.indexOf(userRoles[role]) != -1) {
                             response.allow = true;
