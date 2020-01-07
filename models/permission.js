@@ -33,7 +33,7 @@ var getRole = function (options, aclRoles, cb) {
                                 }
                             }
                         }
-                        checkOwnerRole(userId, OwnerId, function (err, result) {
+                        checkOwnerRole(userId, options.ownerId, function (err, result) {
                             if (err) {
                                 return cb(err)
                             } else {
@@ -86,11 +86,11 @@ var getRolesFromUserModel = function (userId, cb) {
 }
 exports.getRolesFromUserModel = getRolesFromUserModel
 
-var checkOwnerRole = function (userId, OwnerId, userRoles, cb) {
-    if (OwnerId == userId) {
-        cb(null, userRoles)
+var checkOwnerRole = function (userId, ownerId, cb) {
+    if (ownerId == userId) {
+        cb(null, true)
     } else {
-        cb(null, userRoles)
+        cb(null, false)
     }
 }
 exports.checkOwnerRole = checkOwnerRole;
