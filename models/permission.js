@@ -25,9 +25,9 @@ var getRole = function (options, aclRoles, cb) {
                     } else {
                         if (result) {
                             for (var role in result) {
-                                if (result[role] && result[role].roleName) {
-                                    userRoles.push(result[role].roleName)
-                                    if (userRoles.indexOf(result[role].roleName) != -1) {
+                                if (result[role]) {
+                                    userRoles.push(result[role])
+                                    if (aclRoles.indexOf(result[role]) != -1) {
                                         return cb(null, userRoles)
                                     }
                                 }
@@ -99,7 +99,7 @@ var getStaticRole = function (userId, cb) {
     var aggregateQuery = [{
         $lookup: {
             from: 'role',
-            localField: 'role_id',
+            localField: 'roleId',
             foreignField: '_id',
             as: "joinOutput"
         }
@@ -119,7 +119,13 @@ var getStaticRole = function (userId, cb) {
             cb(err)
         } else {
             if (result) {
-                cb(null, result)
+                let roleArr = []
+                for (let roleObj in result) {
+                    if (result[roleObj] && result[roleObj].joinOutput && result[roleObj].joinOutput.roleName) {
+                        roleArr.push(result[roleObj].joinOutput.roleName)
+                    }
+                }
+                cb(null, roleArr)
             } else {
                 cb(null, null)
             }
