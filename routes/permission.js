@@ -12,14 +12,17 @@ router.post('/check_role', function (req, res) {
         accessType: req.body.accessType,
         serviceName: req.body.serviceName
     }
-    permission.checkPermission(options, function (err, result) {
-        if (err) {
-            res.status(500)
-            res.json({ "error": "some error happend" })
-        } else {
-            res.status(200)
-            res.json(result)
-        }
-    })
+    if (req.body.serviceName && req.headers.authorization) {
+        permission.checkPermission(options, function (err, result) {
+            if (err) {
+                console.log(err)
+                res.status(500)
+                res.json({ "allow": false, "userRole": null })
+            } else {
+                res.status(200)
+                res.json(result)
+            }
+        })
+    }
 })
 module.exports = router;
