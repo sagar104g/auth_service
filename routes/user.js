@@ -31,6 +31,7 @@ router.post('/logout', function (req, res) {
 router.post('/getUserId', function (req, res) {
     user.getUserIdFromToken(req.headers.authorization, function (err, result) {
         if (err) {
+            console.log(err)
             res.status(500)
             res.json({ "error": "some error happend" })
         } else {

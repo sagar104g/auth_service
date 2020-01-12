@@ -23,6 +23,9 @@ router.post('/check_role', function (req, res) {
                 res.json(result)
             }
         })
+    }else{
+        res.status(200)
+        res.json({ "allow": false, "userRole": null })
     }
 })
 module.exports = router;
